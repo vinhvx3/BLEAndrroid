@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="10dp"
+    android:background="#EAE9E9">
+
+    <TextView
+        android:id="@+id/textviewname"
+        android:layout_width="319dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="7dp"
+        android:layout_toStartOf="@+id/imageviewicon"
+        android:paddingEnd="60dp"
+        android:text="This is Name  "
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+
+        android:id="@+id/textviewdescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textviewname"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="10dp"
+        android:text="Description of device is here"
+        android:textSize="16sp" />
+
+    <ImageButton
+        android:id="@+id/imageviewicon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="25dp"
+        android:background="@drawable/icon_info"
+        android:contentDescription="@string/app_name" />
+
+
+</RelativeLayout>
