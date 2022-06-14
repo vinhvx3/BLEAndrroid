@@ -6,15 +6,18 @@ import android.os.Parcelable;
 public class BLEDevice implements Parcelable {
     private String Name;
     private String Description;
+    private int Rssi;
 
-    public BLEDevice(String name, String description) {
+    public BLEDevice(String name, String description, int rssi) {
         Name = name;
         Description = description;
+        Rssi = rssi;
     }
 
     protected BLEDevice(Parcel in) {
         Name = in.readString();
         Description = in.readString();
+        Rssi = in.readInt();
     }
 
     public static final Creator<BLEDevice> CREATOR = new Creator<BLEDevice>() {
@@ -28,6 +31,15 @@ public class BLEDevice implements Parcelable {
             return new BLEDevice[size];
         }
     };
+
+
+    public int getRssi() {
+        return Rssi;
+    }
+
+    public void setRssi(int rssi) {
+        Rssi = rssi;
+    }
 
     public String getName() {
         return Name;
@@ -54,5 +66,6 @@ public class BLEDevice implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(Name);
         dest.writeString(Description);
+        dest.writeInt(Rssi);
     }
 }

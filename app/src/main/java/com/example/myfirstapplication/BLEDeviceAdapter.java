@@ -42,7 +42,7 @@ public class BLEDeviceAdapter extends BaseAdapter {
     }
 
     protected class ViewHolder {
-        TextView txtName, txtDescription;
+        TextView txtName, txtDescription, txtRssi;
         ImageView ivInfo;
     }
 
@@ -52,15 +52,18 @@ public class BLEDeviceAdapter extends BaseAdapter {
         ViewHolder holder;
 
         if (convertView == null) {
-            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater inflater = LayoutInflater.from(context);
 
-            convertView = inflater.inflate(layout, null);
+
+            convertView = inflater.inflate(layout, parent, false);
 
             holder = new ViewHolder();
 
             holder.txtName = (TextView) convertView.findViewById(R.id.textviewname);
             holder.txtDescription = (TextView) convertView.findViewById(R.id.textviewdescription);
-            holder.ivInfo = convertView.findViewById(R.id.imageviewicon);
+            holder.txtRssi = (TextView) convertView.findViewById(R.id.rssi);
+
+            holder.ivInfo = (ImageView) convertView.findViewById(R.id.imageviewicon);
 
             convertView.setTag(holder);
         } else {
@@ -72,6 +75,7 @@ public class BLEDeviceAdapter extends BaseAdapter {
         BLEDevice device = bleDeviceList.get(position);
         holder.txtName.setText(device.getName());
         holder.txtDescription.setText(device.getDescription());
+        holder.txtRssi.setText(String.valueOf(device.getRssi()));
 
         holder.txtName.setOnClickListener(new View.OnClickListener() {
             @Override

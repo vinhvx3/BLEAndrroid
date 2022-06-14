@@ -7,13 +7,15 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class InfoActivity extends AppCompatActivity {
 
-    private TextView tvInfo;
+    private TextView dvName, dvMac;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
-        tvInfo = findViewById(R.id.tv_info);
+        dvName = findViewById(R.id.deviceName);
+        dvMac = findViewById(R.id.deviceMac);
+
         getInfo();
     }
 
@@ -21,7 +23,8 @@ public class InfoActivity extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             BLEDevice device = extras.getParcelable("key");
-            tvInfo.setText(device.getName() + " " + device.getDescription());
+            dvName.setText(device.getName());
+            dvMac.setText(device.getDescription());
         }
     }
 }
