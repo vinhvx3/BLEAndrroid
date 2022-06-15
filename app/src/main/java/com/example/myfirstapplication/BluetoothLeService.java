@@ -13,7 +13,7 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-class BluetoothLeService extends Service {
+public class BluetoothLeService extends Service {
 
     private Binder binder = new LocalBinder();
 
@@ -32,6 +32,7 @@ class BluetoothLeService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
+        Log.e(TAG, "Bind service");
         return binder;
     }
 
@@ -46,6 +47,7 @@ class BluetoothLeService extends Service {
     private BluetoothAdapter bluetoothAdapter;
 
     public boolean initialize() {
+        Log.e(TAG, "Service initialize");
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null) {
             Log.e(TAG, "Unable to obtain a BluetoothAdapter.");
@@ -55,6 +57,7 @@ class BluetoothLeService extends Service {
     }
 
     public boolean connect(final String address) {
+        Log.d(TAG, "connect" + address);
         if (bluetoothAdapter == null || address == null) {
             Log.w(TAG, "BluetoothAdapter not initialized or unspecified address.");
             return false;
@@ -78,12 +81,15 @@ class BluetoothLeService extends Service {
     private final BluetoothGattCallback bluetoothGattCallback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+            Log.d(TAG, "Bluetooth state chang: " + newState);
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 // successfully connected to the GATT Server
+                Log.d(TAG, "successfully connected to the GATT Server");
                 connectionState = STATE_CONNECTED;
                 broadcastUpdate(ACTION_GATT_CONNECTED);
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 // disconnected from the GATT Server
+                Log.d(TAG, "disconnected from the GATT Server");
                 connectionState = STATE_DISCONNECTED;
                 broadcastUpdate(ACTION_GATT_DISCONNECTED);
             }

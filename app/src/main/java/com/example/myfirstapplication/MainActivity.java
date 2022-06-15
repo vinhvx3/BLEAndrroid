@@ -4,13 +4,17 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanRecord;
 import android.bluetooth.le.ScanResult;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Build;
 import android.os.Bundle;
@@ -54,6 +58,12 @@ public class MainActivity extends AppCompatActivity {
     BluetoothManager bluetoothManager;
     BluetoothAdapter bluetoothAdapter;
 
+
+
+    private BluetoothLeService bluetoothService;
+
+    private BluetoothGatt bluetoothGatt;
+
     private BluetoothLeScanner bluetoothLeScanner;
     private boolean scanning;
     private Handler handler = new Handler();
@@ -73,14 +83,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-//                    GetListDevice();
                     scanLeDevice();
                 } else {
                     ClearListDevice();
                 }
-
-//                ShowListDeviceConnected();
-//                ShowListDevice();
             }
         });
 
@@ -130,23 +136,27 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
 
+                    ScanRecord scanRecord = result.getScanRecord();
 
-//                    if (Objects.equals(result.getDevice().getName(), "") || result.getDevice().getName() == null) {
-//                        return;
-//                    }
-
-                    if(result.getRssi() < -50) {
+                    if(result.getRssi() < -50 || scanRecord == null) {
                         return;
                     }
 
-                    BLEDevice device = new BLEDevice(result.getDevice().getAddress(), result.getDevice().getName(), result.getRssi());
+                    Log.d("TAG", scanRecord.toString());
+
+
+                    BLEDevice device = new BLEDevice(
+                            result.getDevice().getAddress(),
+                            result.getDevice().getName(),
+                            result.getRssi(),
+                            scanRecord.toString());
+
+
                     arrDevice.add(device);
 
                     bleDeviceList.add(result.getDevice());
 
                     ShowListDevice();
-//                    leDeviceListAdapter.addDevice(result.getDevice());
-//                    leDeviceListAdapter.notifyDataSetChanged();
                 }
             };
 
@@ -172,34 +182,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // ----------------------------------------
-
-    // ----------------------------------
-
-
-
-    private void GetListDevice() {
-//        arrDevice = new ArrayList<>();
-
-//        arrDevice.add(new BLEDevice("IPhone XR", "XYJSKIDU9832J"));
-//        arrDevice.add(new BLEDevice("SamSung Note 5", "JFHDSJFHI3"));
-//        arrDevice.add(new BLEDevice("IPhone 12", "T56TGW43FE"));
-//        arrDevice.add(new BLEDevice("Xiaomi", "RETR6464EE"));
-//        arrDevice.add(new BLEDevice("Nokia", "RER4W5456465J"));
-//
-//        arrDevice.add(new BLEDevice("IPhone XR", "XYJSKIDU9832J"));
-//        arrDevice.add(new BLEDevice("SamSung Note 5", "JFHDSJFHI3"));
-//        arrDevice.add(new BLEDevice("IPhone 12", "T56TGW43FE"));
-//        arrDevice.add(new BLEDevice("Xiaomi", "RETR6464EE"));
-//        arrDevice.add(new BLEDevice("Nokia", "RER4W5456465J"));
-
-    }
 
     private void ClearListDevice () {
         arrDevice = new ArrayList<>();
         bleDeviceList = new ArrayList<>();
         posConnected = -1;
         ShowListDevice();
+        ShowListDeviceConnected();
     }
 
     private void ShowListDevice () {
@@ -262,21 +251,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void connectDevice(int position) {
-//        if (position < posConnected) {
-//            posConnected = position;
-//        } else {
-//            posConnected = position + 1;
-//        }
-
-        Log.d("POS: ", String.valueOf(position));
-        Log.d("SIZE: ", String.valueOf(bleDeviceList.size()));
-
-        Log.d("CHECK", bleDeviceList.get(position).getAddress().toString());
-
         deviceAddress = bleDeviceList.get(position).getAddress();
 
-//        ShowListDevice();
-//        ShowListDeviceConnected();
+        if(deviceAddress != null) {
+            bluetoothService.connect(deviceAddress);
+        }
+
     }
 
     private void openDeviceInfo(int position){
@@ -286,12 +266,11 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private BluetoothLeService bluetoothService;
 
-
-    private ServiceConnection serviceConnection = new ServiceConnection() {
+    public ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
+            Log.e("TAG", "On service connected");
             bluetoothService = ((BluetoothLeService.LocalBinder) service).getService();
             if (bluetoothService != null) {
                 if (!bluetoothService.initialize()) {
@@ -299,6 +278,7 @@ public class MainActivity extends AppCompatActivity {
                     finish();
                 }
                 // perform device connection
+                Log.e("TAG", "initialize Bluetooth success");
                 bluetoothService.connect(deviceAddress);
             }
         }
@@ -309,5 +289,62 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    Boolean connected = false;
 
+    private final BroadcastReceiver gattUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+            if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
+                connected = true;
+                updateConnectionState("connected");
+            } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
+                connected = false;
+                updateConnectionState("disconnect");
+
+            }
+        }
+    };
+
+    private void updateConnectionState (String message) {
+        if (message == "connected") {
+            Log.d("CONNECT", "Connected Success");
+            for(int i = 0; i < arrDevice.size(); i++) {
+                if(Objects.equals(arrDevice.get(i).getName(), deviceAddress)) {
+                    posConnected = i;
+                    ShowListDevice();
+                    ShowListDeviceConnected();
+                    return;
+                }
+            }
+        } else {
+            Log.d("CONNECT", "Disconected");
+
+        }
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        registerReceiver(gattUpdateReceiver, makeGattUpdateIntentFilter());
+        if (bluetoothService != null) {
+            final boolean result = bluetoothService.connect(deviceAddress);
+            Log.d("TAG", "Connect request result=" + result);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(gattUpdateReceiver);
+    }
+
+    private static IntentFilter makeGattUpdateIntentFilter() {
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
+        intentFilter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
+        return intentFilter;
+    }
 }

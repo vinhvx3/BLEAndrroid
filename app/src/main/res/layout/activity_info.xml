@@ -55,20 +55,21 @@
         app:layout_constraintStart_toEndOf="@+id/dv_Name"
         app:layout_constraintTop_toBottomOf="@id/deviceMac" />
 
+
     <TextView
-        android:id="@+id/dv_Uuid"
+        android:id="@+id/dv_Rssi"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="40dp"
         android:layout_marginTop="10dp"
-        android:text="UUID:  "
+        android:text="RSSI:"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dv_Name" />
 
     <TextView
-        android:id="@+id/deviceUuid"
+        android:id="@+id/deviceRssi"
         android:layout_width="247dp"
         android:layout_height="0dp"
         android:layout_marginTop="10dp"
@@ -77,19 +78,34 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/dv_Uuid"
+        app:layout_constraintStart_toEndOf="@+id/dv_Rssi"
         app:layout_constraintTop_toBottomOf="@id/deviceName" />
 
-    <Button
-        android:id="@+id/btn_Exit"
-        android:layout_width="wrap_content"
+    <TextView
+        android:id="@+id/dv_ManufacturerSpecific"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="52dp"
-        android:backgroundTint="#2196F3"
-        android:text="Exit"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="10dp"
+        android:text="Manufacturer Specific:"
+        android:textSize="18sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/deviceUuid" />
+        app:layout_constraintTop_toBottomOf="@id/dv_Rssi" />
+
+    <TextView
+        android:id="@+id/deviceManufacturerSpecific"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginStart="40dp"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dv_ManufacturerSpecific" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

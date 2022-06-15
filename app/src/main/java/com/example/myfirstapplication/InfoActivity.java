@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class InfoActivity extends AppCompatActivity {
 
-    private TextView dvName, dvMac;
+    private TextView dvName, dvMac, dvUuid, dvTxPowerLevel, dvRssid, dvManufacturerSpecific;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -15,6 +15,8 @@ public class InfoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_info);
         dvName = findViewById(R.id.deviceName);
         dvMac = findViewById(R.id.deviceMac);
+        dvRssid = findViewById(R.id.deviceRssi);
+        dvManufacturerSpecific = findViewById(R.id.deviceManufacturerSpecific);
 
         getInfo();
     }
@@ -23,8 +25,15 @@ public class InfoActivity extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             BLEDevice device = extras.getParcelable("key");
-            dvName.setText(device.getName());
-            dvMac.setText(device.getDescription());
+            dvMac.setText(device.getName());
+            dvName.setText(device.getDescription());
+            dvRssid.setText(String.valueOf(device.getRssi()));
+
+            if (device.getScanRecord() != null) {
+                dvManufacturerSpecific.setText(device.getScanRecord());
+            }
+
+
         }
     }
 }
